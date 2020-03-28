@@ -1,17 +1,27 @@
+local enet = require "enet"
 
-local socket = require "socket"
-local address, port = "localhost", 12345
-udp = socket.udp()
-udp:setpeername(address, port)
-udp:settimeout(0)
+local host = enet.host_create()
+local server = host:connect("localhost:5678")
 
-function love.draw()
-	love.graphics.draw(image)
+imageData = love.image.newImageData("fff.png")
+pixels = imageData:getString()
+
+print(string.len(pixels))
+local buff = ""
+for i = 1, #pixels do
+    local c = pixels:sub(i,i)
+	buff = buff .. c
+	if(string.len(buff) > 9000 or i == #pixels) then
+		local event = host:service(1)		
+		server:send(buff)
+		buff = ""
+	end
 end
+local event = host:service(1)	
+server:send("test")
 
-function love.update()
-	udp:send("Firefox_wallpaper.png")
-	image = love.graphics.newImage("Firefox_wallpaper.png")
-	--data = udp:receive()
-end
+server:disconnect()
+host:flush()
+
+print"done"
 
