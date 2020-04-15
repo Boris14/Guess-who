@@ -1,17 +1,78 @@
+local enet = require "enet"
+require "torch"
 
-local socket = require "socket"
-local address, port = "localhost", 12345
-udp = socket.udp()
-udp:setpeername(address, port)
-udp:settimeout(0)
+local host = enet.host_create()
+local server = host:connect("localhost:5678")
 
-function love.draw()
-	love.graphics.draw(image)
+--		funtion to send an image by its name by
+--		breaking it down to pixels and sending
+--		them as a string 
+function sendImage(imageName)
+
+	local imageData = love.image.newImageData(imageName)
+	local pixels = imageData:getString()
+	local imageWidth = imageData:getWidth()
+	local imageHeight = imageData:getHeight()
+
+	local event = host:service(30)
+	server:send(tostring(imageWidth))
+	local event = host:service(30)
+	server:send(tostring(imageHeight)) 
+
+	local pixelsLeft = pixels:len()
+	local buff = ""
+	for i = 0, #pixels, 8000 do
+		local c = ""
+		if(pixelsLeft <= 8000) then
+			c = pixels:sub(i+1)
+			pixelsLeft = 0
+		else		
+			c = pixels:sub(i+1,i + 8000)
+			pixelsLeft = pixelsLeft - 8000
+		end
+		buff = buff .. c
+		if(string.len(buff) >= 9000 or i == #pixels or pixelsLeft == 0) then			
+			local event = host:service(2)		
+			server:send(buff)
+			buff = ""
+			if(pixelsLeft == 0) then
+				break
+			end
+		end
+	end
+
+	local event = host:service(20)	
+	server:send("end")
+
 end
+--		end of sendImage(imageName)
 
-function love.update()
-	udp:send("Firefox_wallpaper.png")
-	image = love.graphics.newImage("Firefox_wallpaper.png")
-	--data = udp:receive()
+
+--		function to send all the images from the Client/
+--		directory using sendImage(imageName)
+function sendAllImages()
+	for file in paths.files("Client/") do
+		is_image = false
+		local c = file:sub(-4)
+		if(c == ".png") then
+			is_image = true
+		end
+
+		if(is_image) then
+			sendImage(file)
+		end
+	end
+
 end
+--		end of sendAllImages()
+
+sendAllImages()
+
+local event = host:service(20)	
+server:send("it doesn't work without this send")
+
+server:disconnect()
+host:flush()
+
+print"done"
 
