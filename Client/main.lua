@@ -14,23 +14,34 @@ function sendImage(imageName)
 	local imageWidth = imageData:getWidth()
 	local imageHeight = imageData:getHeight()
 
-	local event = host:service(1)
+	local event = host:service(30)
 	server:send(tostring(imageWidth))
-	local event = host:service(1)
+	local event = host:service(30)
 	server:send(tostring(imageHeight)) 
 
+	local pixelsLeft = pixels:len()
 	local buff = ""
-	for i = 1, #pixels do
-		local c = pixels:sub(i,i)
+	for i = 0, #pixels, 8000 do
+		local c = ""
+		if(pixelsLeft <= 8000) then
+			c = pixels:sub(i+1)
+			pixelsLeft = 0
+		else		
+			c = pixels:sub(i+1,i + 8000)
+			pixelsLeft = pixelsLeft - 8000
+		end
 		buff = buff .. c
-		if(string.len(buff) > 9000 or i == #pixels) then
-			local event = host:service(1)		
+		if(string.len(buff) >= 9000 or i == #pixels or pixelsLeft == 0) then			
+			local event = host:service(2)		
 			server:send(buff)
 			buff = ""
+			if(pixelsLeft == 0) then
+				break
+			end
 		end
 	end
 
-	local event = host:service(1)	
+	local event = host:service(20)	
 	server:send("end")
 
 end
@@ -42,17 +53,9 @@ end
 function sendAllImages()
 	for file in paths.files("Client/") do
 		is_image = false
-		for i = #file,1,-1 do
-			local a = file:sub(i,i)
-			local b = file:sub(i-1,i-1)
-			local c = file:sub(i-2,i-2)
-			local d = file:sub(i-3,i-3)
-			if(a == 'g' and b == 'n' and c == 'p' and d == '.') then
-				is_image = true
-				break
-			else
-				break
-			end
+		local c = file:sub(-4)
+		if(c == ".png") then
+			is_image = true
 		end
 
 		if(is_image) then
@@ -65,7 +68,7 @@ end
 
 sendAllImages()
 
-local event = host:service(1)	
+local event = host:service(20)	
 server:send("it doesn't work without this send")
 
 server:disconnect()
