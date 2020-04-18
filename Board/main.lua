@@ -9,9 +9,6 @@ end
 
 local boxes = {}
 local font = nil
-imageData1 = love.image.newImageData( "1.jpeg" )
-imageData2 = love.image.newImageData( "1.jpeg" )
-print(imageData1 == imageData2)
 
 function love.load()
 	font = love.graphics.newFont("/assets/Summit Attack.ttf", 32)
