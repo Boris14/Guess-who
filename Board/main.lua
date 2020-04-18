@@ -1,3 +1,6 @@
+math.randomseed( os.time() )
+math.random(); math.random(); math.random()
+
 function newBox(image)
 	return{
 		image = love.graphics.newImage(image),
