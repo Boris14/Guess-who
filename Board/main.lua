@@ -9,17 +9,28 @@ end
 
 local boxes = {}
 local font = nil
+local images = {}
+
+function fileExists(name) 
+	local file = io.open( "Board/" .. name, "r" )
+	if file then
+		return true
+	else
+		return false
+	end
+end
 
 function love.load()
 	font = love.graphics.newFont("/assets/Summit Attack.ttf", 32)
-	for i = 0, 24 do
-		if(love.math.random(1,2) == 1) then
-			table.insert(boxes, newBox("1.jpeg"))
-		elseif(love.math.random(1,2) == 1) then
-			table.insert(boxes, newBox("2.jpg"))
+	for i = 1, 25 do
+		if fileExists(tostring(i) .. ".png") then 
+			table.insert(images, tostring(i) .. ".png")
 		else
-			table.insert(boxes, newBox("3.png"))
+			table.insert(images, tostring(i) .. ".jpg")
 		end
+	end 	
+	for	i = 1, 25 do
+		table.insert(boxes, newBox(images[i]))
 	end
 	window_width = love.graphics.getWidth()
 	window_height = love.graphics.getHeight()
