@@ -54,11 +54,11 @@ function sendAllImages()
 	for file in paths.files("Client/") do
 		is_image = false
 		local c = file:sub(-4)
-		if(c == ".png") then
-			is_image = true
+		if(c == ".png" or c == "jpeg" or c == ".jpg") then
+			isImage = true
 		end
 
-		if(is_image) then
+		if(isImage) then
 			sendImage(file)
 		end
 	end
