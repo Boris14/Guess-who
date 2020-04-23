@@ -80,9 +80,16 @@ function loadFaces(directory)
 		if(c == ".png" or c == "jpeg" or c == ".jpg") then
 			isImage = true
 		end
+		for i = 1, #directory do
+			local a = directory:sub(i,i)
+			if(a == '/') then
+				limiter = i + 1
+				break
+			end
+		end
 
 		if(isImage) then
-			local directoryName = directory:sub(6)
+			local directoryName = directory:sub(limiter)
 			local newFace = love.graphics.newImage(directoryName .. file)
 			table.insert(faces, newFace)
 		end

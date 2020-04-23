@@ -30,6 +30,7 @@ function love.load()
 	createMenu()
 	hasBoard = false
 	openMenu = true
+	directory = "Game/LeagueOfLegends/"
 end
 
 function love.update(dt)
@@ -54,10 +55,10 @@ function love.update(dt)
 			commandValue = nil
 		elseif(commandValue == "join" and not loading) then
 			joinGame()
-			faces = loadFaces("Game/ClashRoyale/")
+			faces = loadFaces(directory)
 			loadBoard(faces)
 			hasBoard = true 
-			sendAllImages("Game/ClashRoyale/")
+			sendAllImages(directory)
 			local event = host:service(20)	
 			server:send("control")	
 			hasBoard = true
