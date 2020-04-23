@@ -54,10 +54,10 @@ function love.update(dt)
 			commandValue = nil
 		elseif(commandValue == "join" and not loading) then
 			joinGame()
-			faces = loadFaces("Server/ClashRoyale/")
+			faces = loadFaces("Game/ClashRoyale/")
 			loadBoard(faces)
-			hasBoard = true
-			sendAllImages("Server/ClashRoyale/")
+			hasBoard = true 
+			sendAllImages("Game/ClashRoyale/")
 			local event = host:service(20)	
 			server:send("control")	
 			hasBoard = true

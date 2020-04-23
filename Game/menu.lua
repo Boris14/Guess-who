@@ -45,6 +45,7 @@ function createMenu()
 end
 
 function drawMenu(command)
+	--love.graphics.setBackgroundColor()
 	cursor_y = 0 --the place of the next button
 
 	for i, button in ipairs(buttons) do
@@ -53,7 +54,7 @@ function drawMenu(command)
 		local bx = (window_width * 0.5) - (button_width * 0.5)
 		local by = (window_height * 0.5) - (total_height * 0.5) + cursor_y
 
-		local color = {0, 0, 0} --button color
+		local color = {61/255, 61/255, 61/255} --button color
 
 		local mx, my = love.mouse.getPosition()
 
@@ -61,7 +62,7 @@ function drawMenu(command)
 					my > by and my < by + BUTTON_HEIGHT
 
 		if hot then
-			color = {0.3, 0.1, 0.3}	--if the button is being hovered over, make it brighter
+			color = {122/255, 122/255, 122/255}	--if the button is being hovered over, make it brighter
 		end
 	
 		button.now = love.mouse.isDown(1) 
@@ -82,7 +83,7 @@ function drawMenu(command)
 			BUTTON_HEIGHT
 		)
 
-		love.graphics.setColor(0,0.45,1) --text color
+		love.graphics.setColor(1,1,1) --text color
 		love.graphics.setFont(font)
 		love.graphics.pop()
 		local text_width = font:getWidth(button.text)

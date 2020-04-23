@@ -58,7 +58,7 @@ function sendAllImages(directory)
 		end
 
 		if(isImage) then
-			local directoryName = directory:sub(7)
+			local directoryName = directory:sub(6)
 			sendImage(directoryName .. file, host, server)
 		end
 	end
@@ -82,7 +82,7 @@ function loadFaces(directory)
 		end
 
 		if(isImage) then
-			local directoryName = directory:sub(7)
+			local directoryName = directory:sub(6)
 			local newFace = love.graphics.newImage(directoryName .. file)
 			table.insert(faces, newFace)
 		end
