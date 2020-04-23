@@ -1,65 +1,93 @@
 local enet = require "enet"
+require "server"
+require "board"
+require "menu"
+require "client"
 
-local host = enet.host_create"localhost:5678"
 
+newFaces = {}
+loading = 1
 
-newImages = {}
-
-function sleep(n)
-  os.execute("sleep " .. tonumber(n))
-end
-
-function love.draw()
-	for i = 1, #newImages do
-		love.graphics.draw(newImages[i])
-		--sleep(2)
+function love.keypressed(k)
+	if (isClient) then
+		if (k == 'escape') then
+			server:disconnect()
+			host:flush()
+			love.event.quit()	
+		elseif (k == 'g') then
+			sendGuess("yo mama")
+		end
+	else 
+		if (k == 'escape') then
+			love.event.quit()
+		end
 	end
 end
 
+function love.load()
+	command = nil
+	commandValue = nil
+	createMenu()
+	hasBoard = false
+	openMenu = true
+end
 
---		function to recieve an image sent by sendImage(imageName)
---		and returning it or returning nil if no image is sent 
-function recieveImage()
-	local pixels = ""
-	local imageWidth = 0
-	local imageHeight = 0
-	local image = nil
-	while true do
-		local event = host:service(1)
-		if event then
-			if event.type == "receive" then
-				if(imageWidth == 0) then
-					imageWidth = tonumber(event.data)
-				elseif(imageHeight == 0) then
-					imageHeight = tonumber(event.data)
-				elseif(event.data ~= "end") then
-					pixels = pixels .. event.data
+function love.update(dt)
+	if(commandValue) then
+		openMenu = false
+		if(loading == 1) then
+			loading = true
+		end
+		if(commandValue == "create" and not loading) then
+			createGame()
+			while true do
+				newData = recieveImage()
+				if(newData) then
+					table.insert(newFaces, newData)
 				else
-					local newImageData = love.image.newImageData(imageWidth, imageHeight, "rgba8", pixels)
-					image = love.graphics.newImage( newImageData )					
-					break
-				end
-			elseif event.type == "connect" then
-				print("Connect:", event.peer)
-				host:broadcast("new client connected")
-			else
-				print("Got event", event.type, event.peer)
-				if (event.type == "disconnect") then
 					break
 				end
 			end
+			loadBoard(newFaces)
+			hasBoard = true
+			isHost = true
+			commandValue = nil
+		elseif(commandValue == "join" and not loading) then
+			joinGame()
+			faces = loadFaces("Server/ClashRoyale/")
+			loadBoard(faces)
+			hasBoard = true
+			sendAllImages("Server/ClashRoyale/")
+			local event = host:service(20)	
+			server:send("control")	
+			hasBoard = true
+			isClient = true
+			commandValue = nil	
 		end
 	end
-	return image 
+	if(hasBoard) then
+		updateBoard()	
+	end
+	if(isHost) then
+		checkInput()
+	end
 end
---		end of recieveImage()
 
-while true do
-	newData = recieveImage()
-	if(newData) then
-		table.insert(newImages, newData)
-	else
-		break
+function love.draw()
+	if(openMenu) then
+		command = drawMenu(command)
+		if(command) then
+			commandValue = command
+			command = nil
+		end
+	end
+	if(hasBoard) then
+		drawBoard()
+	end
+	if(loading and loading ~=1) then
+		love.graphics.clear()	
+		love.graphics.print("Waiting for other players...", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
+		loading = false
 	end
 end
 

@@ -1,4 +1,4 @@
-image = love.graphics.newImage("cat.png")
+image = love.graphics.newImage("assets/24.jpg")
 faces = 1
 rowsDistance = faces / 5
 
