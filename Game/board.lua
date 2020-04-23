@@ -20,8 +20,15 @@ function loadImages(directory)
 	local images = {}
 	for file in paths.files(directory) do
 		local c = file:sub(-4)
+		for i = 1, #directory do
+			local a = directory:sub(i,i)
+			if(a == '/') then
+				limiter = i + 1
+				break
+			end
+		end
 		if(c == ".png" or c == "jpeg" or c == ".jpg") then
-			local directoryName = directory:sub(7)
+			local directoryName = directory:sub(limiter)
 			table.insert(images, directoryName .. file)
 		end		
 	end
