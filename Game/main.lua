@@ -30,7 +30,7 @@ function love.load()
 	createMenu()
 	hasBoard = false
 	openMenu = true
-	directory = "Game/LeagueOfLegends/"
+	directory = "Game/ClashRoyale/"
 end
 
 function love.update(dt)
