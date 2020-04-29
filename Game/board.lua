@@ -3,9 +3,10 @@ math.random(); math.random(); math.random()
 
 require "torch"
 
-function newBox(image)
+function newBox(image, image_id)
 	return{
 		image = image,
+		image_id = image_id,
 		up = true,
 		last = false, 
 		now = false
@@ -52,7 +53,7 @@ function loadBoard(faces)
 	avarageWidth = 0
 	avarageHeight = 0
 	for	i = 1, 25 do
-		table.insert(boxes, newBox(faces[i]))
+		table.insert(boxes, newBox(faces[i], i))
 		avarageWidth = avarageWidth + boxes[i].image:getWidth()
 		avarageHeight = avarageHeight + boxes[i].image:getHeight()
 	end
@@ -101,6 +102,10 @@ function drawBoard()
 			end	
 		end
 
+		if love.keyboard.isDown('g') and hot then
+			sendGuess(box.image_id)
+		end
+
 		if box.up then
 				imageScalingX = imageWidth / box.image:getWidth()
 				imageScalingY = imageHeight / box.image:getHeight()
@@ -117,7 +122,7 @@ function drawBoard()
 	love.graphics.setFont(font)	
 	love.graphics.print("You are:", love.graphics.getWidth()*0.7, love.graphics.getHeight() * 0.9)	
 	
-	cursor_y = cursor_y + gapHeight + imageHeight	
+	cursor_y = cursor_y + gapHeight + imageHeight
 	love.graphics.draw(myImage.image , love.graphics.getWidth()*0.7 + 100, love.graphics.getHeight() * 0.9 - 65, 0, myImageScalingX, myImageScalingY)
 end
 
