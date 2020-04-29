@@ -2,7 +2,9 @@ local enet = require "enet"
 
 function createGame()
 	host = enet.host_create"localhost:5678"
+	server = host:connect("localhost:6789")
 end
+
 
 --		function to recieve an image sent by sendImage(imageName)
 --		and returning it or returning nil if no image is sent 
@@ -29,8 +31,7 @@ function recieveImage()
 					break
 				end
 			elseif event.type == "connect" then
-				print("Connect:", event.peer)
-				host:broadcast("new client connected")
+				--print("Connect:", event.peer)
 			else
 				print("Got event", event.type, event.peer)
 				if (event.type == "disconnect") then
@@ -48,13 +49,9 @@ function checkInput()
 	if event then
 		if event.type == "receive" then
 			if(event.data ~= "control") then
-				print(event.data)
+				do return event.data end
 			end	
-		elseif event.type == "connect" then
-			print("Connect:", event.peer)
-			host:broadcast("new client connected")
-		else
-			print("Got event", event.type, event.peer)
 		end
 	end
+	return nil
 end

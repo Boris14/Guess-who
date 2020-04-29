@@ -3,7 +3,7 @@ local enet = require "enet"
 
 
 function joinGame()
-	host = enet.host_create()
+	host = enet.host_create("localhost:6789")
 	server = host:connect("localhost:5678")
 end
 
@@ -74,9 +74,9 @@ function sendAllImages(directory)
 end
 --		end of sendAllImages()
 
-function sendGuess(guess)
+function sendMessage(msg)
 	local event = host:service(20)	
-	server:send(guess)
+	server:send(msg)
 end
 
 function loadFaces(directory)

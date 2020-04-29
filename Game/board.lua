@@ -3,10 +3,10 @@ math.random(); math.random(); math.random()
 
 require "torch"
 
-function newBox(image, image_id)
+function newBox(image, imageId)
 	return{
 		image = image,
-		image_id = image_id,
+		imageId = imageId,
 		up = true,
 		last = false, 
 		now = false
@@ -36,9 +36,6 @@ function loadImages(directory)
 	return images
 end
 
---LeagueOfLegends/
---ClashRoyale/
---Landscapes/
 
 function updateBoard()
 	cursor_y = gapHeight
@@ -79,6 +76,7 @@ function loadBoard(faces)
 	myImageScalingX = imageWidth / myImage.image:getWidth()
 	myImageScalingY = imageHeight / myImage.image:getHeight()
 	flippedImage = love.graphics.newImage("/assets/images.png")
+	return myImage.imageId
 end
 
 function drawBoard()
@@ -103,7 +101,7 @@ function drawBoard()
 		end
 
 		if love.keyboard.isDown('g') and hot then
-			sendGuess(box.image_id)
+			sendMessage(box.imageId)
 		end
 
 		if box.up then
