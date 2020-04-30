@@ -1,10 +1,10 @@
 local enet = require "enet"
 
 
+--local host
 
 function joinGame()
 	host = enet.host_create("localhost:6789")
-	server = host:connect("localhost:5678")
 end
 
 function sendImage(imageName)
@@ -94,7 +94,6 @@ function loadFaces(directory)
 				break
 			end
 		end
-
 		if(isImage) then
 			local directoryName = directory:sub(limiter)
 			local newFace = love.graphics.newImage(directoryName .. file)

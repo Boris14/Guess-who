@@ -2,8 +2,12 @@ local enet = require "enet"
 
 function createGame()
 	host = enet.host_create"localhost:5678"
-	server = host:connect("localhost:6789")
 end
+
+function linkToPlayer(adress)
+	server = host:connect(adress)
+	sendMessage("connected")
+end	 
 
 
 --		function to recieve an image sent by sendImage(imageName)
@@ -45,7 +49,10 @@ end
 --		end of recieveImage()
 
 function checkInput()
-	local event = host:service(1)
+	local event = nil
+	if(host) then
+		event = host:service(1)
+	end
 	if event then
 		if event.type == "receive" then
 			if(event.data ~= "control") then

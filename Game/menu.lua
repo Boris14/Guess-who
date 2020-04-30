@@ -10,27 +10,27 @@ function newButton(text, fn)
 	}
 end	
 
-local buttons = {}
 local font = nil
 	
 
 function createMenu()
+	local buttons = {}
 	font = love.graphics.newFont("assets/Summit Attack.ttf", 32)
 
 	table.insert(buttons, newButton(
 				"Create Game",
-				 function()  --placeholder
-				  return "create" --placeholder
+				 function()  
+				  return "create" 
 			end))
 	table.insert(buttons, newButton(
 				"Join Game",
 				 function()
-				  return "join" --placeholder
+				  return "join" 
 			end))
 	table.insert(buttons, newButton(
 				"Settings",
 				 function()
-				  return "settings" --placeholder
+				  return "settings" 
 			end))
 	table.insert(buttons, newButton(
 				"Exit",
@@ -42,9 +42,30 @@ function createMenu()
 	button_width = window_width * 0.40
 	margin = 16 --margin beetween each button	
 	total_height = (BUTTON_HEIGHT + margin) * #buttons --total height of all buttons
+	return buttons
 end
 
-function drawMenu(command)
+function createGameMenu()
+	buttons = {}
+	font = love.graphics.newFont("assets/Summit Attack.ttf", 32)
+	local folders = loadFolders("Game/")
+	for i, folder in  ipairs(folders) do
+		table.insert(buttons, newButton(
+				folder,
+				 function()  
+				  return folder 
+			end))
+	end					
+	window_width = love.graphics.getWidth()
+	window_height = love.graphics.getHeight()
+	button_width = window_width * 0.40
+	margin = 16 --margin beetween each button	
+	total_height = (BUTTON_HEIGHT + margin) * #buttons --total height of all buttons
+	return buttons
+end
+
+function drawMenu(buttons)
+	local command = nil
 	--love.graphics.setBackgroundColor()
 	cursor_y = 0 --the place of the next button
 

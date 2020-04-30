@@ -21,21 +21,38 @@ function loadImages(directory)
 	local images = {}
 	for file in paths.files(directory) do
 		local c = file:sub(-4)
-		for i = 1, #directory do
-			local a = directory:sub(i,i)
-			if(a == '/') then
-				limiter = i + 1
-				break
-			end
-		end
 		if(c == ".png" or c == "jpeg" or c == ".jpg") then
-			local directoryName = directory:sub(limiter)
-			table.insert(images, directoryName .. file)
+			table.insert(images, file)
+		elseif(file ~= ".." and file ~= ".") then
+			do return false end
 		end		
 	end
 	return images
 end
 
+
+function loadFolders(directory)
+	local folders = {}
+	local isFile = false
+	for file in paths.files(directory) do
+		isFile = false
+		for i = 1, #file do
+			local a = file:sub(i,i)
+			if(a == '.') then
+				isFile = true
+			end
+		end
+		if(file == "assets") then
+			isFile = true
+		end	
+		if not isFile then
+			if loadImages(directory .. file) then
+				table.insert(folders, file)
+			end
+		end
+	end
+	return folders
+end
 
 function updateBoard()
 	cursor_y = gapHeight

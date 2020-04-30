@@ -4,12 +4,12 @@ require "board"
 require "menu"
 require "client"
 
-local newFaces = {}
+local Faces = {}
 local myFace = nil
-local loading = 1
+local loading = false
 
 function love.keypressed(k)
-	if (isClient) then
+	if not (openGameMenu or openMenu) and playerJoined then
 		if (k == 'escape') then
 			server:disconnect()
 			host:flush()
@@ -23,15 +23,18 @@ function love.keypressed(k)
 end
 
 function love.load()
+	openGameMenu = false	
 	gameEnd = nil
 	command = nil
 	commandValue = nil
-	createMenu()
+	buttons = createMenu()
 	hasBoard = false
 	openMenu = true
-	directory = "Game/ClashRoyale/"
+	directory = nil
 	gotGuess = false
 	guess = nil
+	playerJoined = nil
+	finished = false
 end
 
 function love.update(dt)
@@ -40,36 +43,55 @@ function love.update(dt)
 	elseif(gameEnd == 0) then
 		sendMessage("i lost")
 	end
-	if(commandValue) then
+	if(commandValue and not finished) then
 		openMenu = false
-		if(loading == 1) then
-			loading = true
-		end
-		if(commandValue == "create" and not loading) then
-			createGame()
-			while true do
-				newData = recieveImage()
-				if(newData) then
-					table.insert(newFaces, newData)
-				else
-					break
-				end
+		if(commandValue == "create" or isHost) then	
+			if not isHost then				
+				isHost = true
+				createGame()
 			end
-			myFace = loadBoard(newFaces)
-			hasBoard = true
-			isHost = true
-			commandValue = nil
-		elseif(commandValue == "join" and not loading) then
-			joinGame()
-			faces = loadFaces(directory)
-			myFace = loadBoard(faces)
-			hasBoard = true 
-			sendAllImages(directory)
-			local event = host:service(20)	
-			server:send("control")	
-			hasBoard = true
-			isClient = true
-			commandValue = nil	
+			if not openGameMenu then
+				buttons = createGameMenu()
+			end	
+			openGameMenu = true
+			if commandValue ~= "create" then
+				openGameMenu = false
+				directory = "Game/" .. commandValue .. "/"
+			end
+			if(directory and not playerJoined) then
+				loading = true
+				playerJoined = checkInput()
+			end
+			if(playerJoined) then
+				linkToPlayer("localhost:6789")
+				loading = false
+				Faces = loadFaces(directory)
+				myFace = loadBoard(Faces)
+				hasBoard = true 
+				sendAllImages(directory)
+				finished = true
+			end
+		elseif(commandValue == "join" or isClient) then
+			if not isClient then
+				isClient = true
+				joinGame()
+				linkToPlayer("localhost:5678")
+			end
+			if not playerJoined then
+				playerJoined = checkInput()
+			else
+				while true do
+					newData = recieveImage()
+					if(newData) then
+						table.insert(Faces, newData)
+					else
+						break
+					end
+				end
+				myFace = loadBoard(Faces)
+				hasBoard = true
+				finished = true
+			end
 		end
 	end
 	if(hasBoard and not gameEnd) then
@@ -93,8 +115,9 @@ function love.update(dt)
 end
 
 function love.draw()
-	if(openMenu) then
-		command = drawMenu(command)
+	if(openMenu or openGameMenu) then
+		command = drawMenu(buttons)
+		--print(command)
 		if(command) then
 			commandValue = command
 			command = nil
@@ -103,17 +126,16 @@ function love.draw()
 	if(hasBoard and not gameEnd) then
 		drawBoard()
 	end
-	if(loading and loading ~=1) then
+	if(loading) then
 		love.graphics.clear()	
 		love.graphics.print("Waiting for other players...", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
-		loading = false
 	end
 	if(gameEnd == 1) then
 		love.graphics.clear()	
 		love.graphics.print("You Win!", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
 	elseif(gameEnd == 0) then
 		love.graphics.clear()	
-		love.graphics.print("You Lost!", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
+		love.graphics.print("You Lose!", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
 	end
 end
 
