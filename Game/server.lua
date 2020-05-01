@@ -1,12 +1,15 @@
 local enet = require "enet"
 
 function createGame()
-	host = enet.host_create"localhost:5678"
+	local adress = math.random(1000, 9999)
+	host = enet.host_create("localhost:" .. tostring(adress))
+	host:channel_limit(2)
+	return adress
 end
 
 function linkToPlayer(adress)
-	server = host:connect(adress)
-	sendMessage("connected")
+	server = host:connect("localhost:" .. tostring(adress))
+	sendMessage(host:get_socket_address())
 end	 
 
 

@@ -3,8 +3,11 @@ local enet = require "enet"
 
 --local host
 
-function joinGame()
-	host = enet.host_create("localhost:6789")
+function joinGame(adress)
+	local myAdress = math.random(1000, 9999)
+	host = enet.host_create("localhost:" .. tostring(myAdress))
+	server = host:connect("localhost:" .. adress)
+	sendMessage(myAdress)
 end
 
 function sendImage(imageName)

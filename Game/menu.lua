@@ -45,7 +45,7 @@ function createMenu()
 	return buttons
 end
 
-function createGameMenu()
+function createFolderMenu()
 	buttons = {}
 	font = love.graphics.newFont("assets/Summit Attack.ttf", 32)
 	local folders = loadFolders("Game/")
@@ -53,7 +53,7 @@ function createGameMenu()
 		table.insert(buttons, newButton(
 				folder,
 				 function()  
-				  return folder 
+				  return folder
 			end))
 	end					
 	window_width = love.graphics.getWidth()

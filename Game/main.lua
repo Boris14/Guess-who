@@ -1,4 +1,5 @@
 local enet = require "enet"
+local utf8 = require("utf8")
 require "server"
 require "board"
 require "menu"
@@ -7,23 +8,39 @@ require "client"
 local Faces = {}
 local myFace = nil
 local loading = false
+local gameCode = ""
+local openCodeInput = false
 
 function love.keypressed(k)
-	if not (openGameMenu or openMenu) and playerJoined then
-		if (k == 'escape') then
-			server:disconnect()
-			host:flush()
-			love.event.quit()	
-		end
-	else 
-		if (k == 'escape') then
-			love.event.quit()
-		end
+	if not (openFolderMenu or openMenu) and playerJoined and k == 'escape' then
+		server:disconnect()
+		host:flush()
+		love.event.quit()	
+	elseif (k == 'escape') then
+		love.event.quit()
+	elseif k == "backspace" and openCodeInput then
+        -- get the byte offset to the last UTF-8 character in the string.
+        local byteoffset = utf8.offset(gameCode, -1)
+ 
+        if byteoffset then
+            -- remove the last UTF-8 character.
+            -- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
+            gameCode = string.sub(gameCode, 1, byteoffset - 1)
+        end
+	elseif k == "return" and openCodeInput then
+		openCodeInput = false    
+	end
+end
+
+function love.textinput(t)
+	if openCodeInput then
+    	gameCode = gameCode .. t
 	end
 end
 
 function love.load()
-	openGameMenu = false	
+	love.keyboard.setKeyRepeat(true)
+	openFolderMenu = false	
 	gameEnd = nil
 	command = nil
 	commandValue = nil
@@ -34,7 +51,9 @@ function love.load()
 	gotGuess = false
 	guess = nil
 	playerJoined = nil
+	joinedGame = false
 	finished = false
+	adress = nil
 end
 
 function love.update(dt)
@@ -48,22 +67,23 @@ function love.update(dt)
 		if(commandValue == "create" or isHost) then	
 			if not isHost then				
 				isHost = true
-				createGame()
 			end
-			if not openGameMenu then
-				buttons = createGameMenu()
+			if not openFolderMenu and not directory then
+				buttons = createFolderMenu()
+				openFolderMenu = true			
 			end	
-			openGameMenu = true
 			if commandValue ~= "create" then
-				openGameMenu = false
+				openFolderMenu = false
 				directory = "Game/" .. commandValue .. "/"
+				adress = createGame()
+				commandValue = "create"
 			end
 			if(directory and not playerJoined) then
 				loading = true
 				playerJoined = checkInput()
 			end
 			if(playerJoined) then
-				linkToPlayer("localhost:6789")
+				linkToPlayer(playerJoined)
 				loading = false
 				Faces = loadFaces(directory)
 				myFace = loadBoard(Faces)
@@ -74,12 +94,15 @@ function love.update(dt)
 		elseif(commandValue == "join" or isClient) then
 			if not isClient then
 				isClient = true
-				joinGame()
-				linkToPlayer("localhost:5678")
+				openCodeInput = true
 			end
-			if not playerJoined then
+			if not openCodeInput and not joinedGame then
+				joinGame(gameCode)
+				joinedGame = true
+			end
+			if not playerJoined and not openCodeInput then
 				playerJoined = checkInput()
-			else
+			elseif playerJoined then
 				while true do
 					newData = recieveImage()
 					if(newData) then
@@ -115,7 +138,14 @@ function love.update(dt)
 end
 
 function love.draw()
-	if(openMenu or openGameMenu) then
+	if openCodeInput then
+		love.graphics.clear()
+		love.graphics.print("Write game code here:", 300, 200)
+		if gameCode then
+			love.graphics.printf(gameCode, 300, 300, love.graphics.getWidth())
+		end
+	end
+	if(openMenu or openFolderMenu) then
 		command = drawMenu(buttons)
 		--print(command)
 		if(command) then
@@ -128,7 +158,8 @@ function love.draw()
 	end
 	if(loading) then
 		love.graphics.clear()	
-		love.graphics.print("Waiting for other players...", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
+		love.graphics.print("The game code is:", love.graphics.getWidth()/3, love.graphics.getHeight()/3)
+		love.graphics.printf(adress, 400, 400, love.graphics.getWidth())
 	end
 	if(gameEnd == 1) then
 		love.graphics.clear()	
