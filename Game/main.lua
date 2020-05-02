@@ -10,6 +10,9 @@ local myFace = nil
 local loading = false
 local gameCode = ""
 local openCodeInput = false
+local gameCodeError = false
+local errorTimer = 1
+local joinTimer = 3
 
 function love.keypressed(k)
 	if not (openFolderMenu or openMenu) and playerJoined and k == 'escape' then
@@ -19,16 +22,17 @@ function love.keypressed(k)
 	elseif (k == 'escape') then
 		love.event.quit()
 	elseif k == "backspace" and openCodeInput then
-        -- get the byte offset to the last UTF-8 character in the string.
         local byteoffset = utf8.offset(gameCode, -1)
  
         if byteoffset then
-            -- remove the last UTF-8 character.
-            -- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
             gameCode = string.sub(gameCode, 1, byteoffset - 1)
         end
 	elseif k == "return" and openCodeInput then
-		openCodeInput = false    
+		if string.len(gameCode) ~= 4 or tonumber(gameCode) == nil then
+			gameCodeError = true
+		else
+			openCodeInput = false 
+		end   
 	end
 end
 
@@ -54,9 +58,20 @@ function love.load()
 	joinedGame = false
 	finished = false
 	adress = nil
+	messageTime = 0
+	waitTime = 0
+	waitTimeExceeded = false
 end
 
 function love.update(dt)
+	if gameCodeError or waitTimeExceeded then
+		messageTime = messageTime + dt
+		if(messageTime >= errorTimer) then
+			gameCodeError = false
+			waitTimeExceeded = false
+			messageTime = 0
+		end
+	end
 	if(gameEnd == 1) then
 		sendMessage("i won")
 	elseif(gameEnd == 0) then
@@ -82,12 +97,11 @@ function love.update(dt)
 				loading = true
 				playerJoined = checkInput()
 			end
-			if(playerJoined) then
+			if playerJoined and not loading then
 				linkToPlayer(playerJoined)
-				loading = false
 				Faces = loadFaces(directory)
 				myFace = loadBoard(Faces)
-				hasBoard = true 
+				hasBoard = true
 				sendAllImages(directory)
 				finished = true
 			end
@@ -101,7 +115,15 @@ function love.update(dt)
 				joinedGame = true
 			end
 			if not playerJoined and not openCodeInput then
+				waitTime = waitTime + dt
 				playerJoined = checkInput()
+				if waitTime >= joinTimer then
+					waitTime = 0
+					openCodeInput = true
+					gameCode = ""
+					waitTimeExceeded = true
+					joinedGame = false
+				end
 			elseif playerJoined then
 				while true do
 					newData = recieveImage()
@@ -144,6 +166,9 @@ function love.draw()
 		if gameCode then
 			love.graphics.printf(gameCode, 300, 300, love.graphics.getWidth())
 		end
+		if gameCodeError or waitTimeExceeded then
+			love.graphics.printf("Not a valid game code.", 300, 400, love.graphics.getWidth())
+		end
 	end
 	if(openMenu or openFolderMenu) then
 		command = drawMenu(buttons)
@@ -158,6 +183,10 @@ function love.draw()
 	end
 	if(loading) then
 		love.graphics.clear()	
+		if playerJoined then
+			love.graphics.printf("A player has joined!", 400, 500, love.graphics.getWidth())
+			loading = false
+		end
 		love.graphics.print("The game code is:", love.graphics.getWidth()/3, love.graphics.getHeight()/3)
 		love.graphics.printf(adress, 400, 400, love.graphics.getWidth())
 	end

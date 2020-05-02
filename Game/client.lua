@@ -1,14 +1,13 @@
 local enet = require "enet"
 
 
---local host
-
 function joinGame(adress)
 	local myAdress = math.random(1000, 9999)
 	host = enet.host_create("localhost:" .. tostring(myAdress))
 	server = host:connect("localhost:" .. adress)
 	sendMessage(myAdress)
 end
+
 
 function sendImage(imageName)
 
@@ -48,7 +47,6 @@ function sendImage(imageName)
 	server:send("next")
 
 end
---		end of sendImage(imageName)
 
 --		function to send all the images from the Client/
 --		directory using sendImage(imageName)

@@ -14,6 +14,7 @@ function newBox(image, imageId)
 end	
 
 
+background = love.graphics.newImage("assets/background.png")
 success = love.window.setMode(1000, 900)
 
 
@@ -66,7 +67,7 @@ function loadBoard(faces)
 	font = love.graphics.newFont("/assets/Summit Attack.ttf", 32)
 	avarageWidth = 0
 	avarageHeight = 0
-	for	i = 1, 25 do
+	for	i = 1, table.getn(faces) do
 		table.insert(boxes, newBox(faces[i], i))
 		avarageWidth = avarageWidth + boxes[i].image:getWidth()
 		avarageHeight = avarageHeight + boxes[i].image:getHeight()
@@ -97,6 +98,11 @@ function loadBoard(faces)
 end
 
 function drawBoard()
+	 for i = 0, love.graphics.getWidth() / background:getWidth() do
+        for j = 0, love.graphics.getHeight() / background:getHeight() do
+            love.graphics.draw(background, i * background:getWidth(), j * background:getHeight())
+        end
+    end
 	for i, box in ipairs(boxes) do
 		box.last = box.now
 
