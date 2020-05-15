@@ -126,6 +126,18 @@ function drawBoard()
 			end	
 		end
 
+		if hot then
+			right_image = box.image
+			print(box.image)
+		else
+			right_image = "none"
+			print("none")
+		end	
+
+		if right_image ~= "none" then
+			love.graphics.draw(right_image)
+		end		
+
 		if love.keyboard.isDown('g') and hot then
 			sendMessage(box.imageId)
 		end
