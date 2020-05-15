@@ -15,7 +15,6 @@ end
 
 
 background = love.graphics.newImage("assets/background.png")
---success = love.window.setMode(1000, 900)
 love.window.setMode(0, 0)
 monitor_width = love.graphics.getWidth()
 monitor_height = love.graphics.getHeight()
@@ -80,8 +79,8 @@ function loadBoard(faces)
 	avarageHeight = avarageHeight / table.getn(faces)
 	avarageArea = avarageWidth * avarageHeight
 	
-	windowWidth = love.graphics.getWidth() * 0.75
-	windowHeight = love.graphics.getHeight() * 0.75
+	windowWidth = love.graphics.getWidth() * 0.85
+	windowHeight = love.graphics.getHeight() * 0.85
 	gapWidth = love.graphics.getWidth() * 0.02
 	imageArea = windowWidth * 0.176 * windowHeight * 0.9 * 0.16
 	scalingFactor = math.sqrt(imageArea / avarageArea)
