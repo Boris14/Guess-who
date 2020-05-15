@@ -5,7 +5,7 @@ function newButton(text, fn)
 	return{
 		text = text,
 		fn = fn,
-		now = false,
+		now = true,
 		last = false
 	}
 end	

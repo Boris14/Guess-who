@@ -15,7 +15,11 @@ end
 
 
 background = love.graphics.newImage("assets/background.png")
-success = love.window.setMode(1000, 900)
+--success = love.window.setMode(1000, 900)
+love.window.setMode(0, 0)
+monitor_width = love.graphics.getWidth()
+monitor_height = love.graphics.getHeight()
+love.window.setMode(monitor_width * 0.5, monitor_height * 0.8)
 
 
 function loadImages(directory)
@@ -76,8 +80,8 @@ function loadBoard(faces)
 	avarageHeight = avarageHeight / table.getn(faces)
 	avarageArea = avarageWidth * avarageHeight
 	
-	windowWidth = 800
-	windowHeight = 600
+	windowWidth = love.graphics.getWidth() * 0.75
+	windowHeight = love.graphics.getHeight() * 0.75
 	gapWidth = love.graphics.getWidth() * 0.02
 	imageArea = windowWidth * 0.176 * windowHeight * 0.9 * 0.16
 	scalingFactor = math.sqrt(imageArea / avarageArea)
@@ -128,9 +132,9 @@ function drawBoard()
 		end
 
 		if box.up then
-				imageScalingX = imageWidth / box.image:getWidth()
-				imageScalingY = imageHeight / box.image:getHeight()
-				love.graphics.draw(box.image , cursor_x, cursor_y, 0, imageScalingX, imageScalingY)
+			imageScalingX = imageWidth / box.image:getWidth()
+			imageScalingY = imageHeight / box.image:getHeight()
+			love.graphics.draw(box.image , cursor_x, cursor_y, 0, imageScalingX, imageScalingY)
 		else 
 			imageScalingX = imageWidth / flippedImage:getWidth()
 			imageScalingY = imageHeight / flippedImage:getHeight()
