@@ -19,6 +19,8 @@ love.window.setMode(0, 0)
 monitor_width = love.graphics.getWidth()
 monitor_height = love.graphics.getHeight()
 love.window.setMode(monitor_width * 0.5, monitor_height * 0.8)
+currentWidth = love.graphics.getWidth()
+currentHeight = love.graphics.getHeight()
 
 
 function loadImages(directory)
@@ -79,8 +81,8 @@ function loadBoard(faces)
 	avarageHeight = avarageHeight / table.getn(faces)
 	avarageArea = avarageWidth * avarageHeight
 	
-	windowWidth = love.graphics.getWidth() * 0.85
-	windowHeight = love.graphics.getHeight() * 0.85
+	windowWidth = love.graphics.getWidth() * 0.75
+	windowHeight = love.graphics.getHeight() * 0.75
 	gapWidth = love.graphics.getWidth() * 0.02
 	imageArea = windowWidth * 0.176 * windowHeight * 0.9 * 0.16
 	scalingFactor = math.sqrt(imageArea / avarageArea)
@@ -89,7 +91,7 @@ function loadBoard(faces)
 	elseif(avarageWidth * scalingFactor < 80) then
 		imageWidth = 80
 	else
-		imageWidth = avarageWidth * scalingFactor
+		imageWidth = avarageWidth * scalingFactor	
 	end
 	imageHeight = imageArea / imageWidth
 	gapHeight = love.graphics.getWidth() * 0.02
@@ -126,22 +128,6 @@ function drawBoard()
 			end	
 		end
 
-		if hot then
-			right_image = box.image
-			print(box.image)
-		else
-			right_image = "none"
-			print("none")
-		end	
-
-		if right_image ~= "none" then
-			love.graphics.draw(right_image)
-		end		
-
-		if love.keyboard.isDown('g') and hot then
-			sendMessage(box.imageId)
-		end
-
 		if box.up then
 			imageScalingX = imageWidth / box.image:getWidth()
 			imageScalingY = imageHeight / box.image:getHeight()
@@ -150,6 +136,25 @@ function drawBoard()
 			imageScalingX = imageWidth / flippedImage:getWidth()
 			imageScalingY = imageHeight / flippedImage:getHeight()
 			love.graphics.draw(flippedImage, cursor_x, cursor_y, 0, imageScalingX, imageScalingY) --placeholder
+		end
+
+		if hot then
+			right_image = box.image
+		else
+			right_image = "none"
+		end	
+
+		if right_image ~= "none" and box.up then
+			rightImageScalingX = imageWidth * 2 / right_image:getWidth()
+			rightImageScalingY = imageHeight * 2 / right_image:getHeight()
+			love.graphics.draw(right_image, currentWidth * 0.7, currentHeight * 0.2, 0, rightImageScalingX, rightImageScalingY)
+			love.graphics.print("Press 'G' to guess", 
+				currentWidth * 0.7, 
+				currentHeight * 0.2 + right_image:getHeight() * rightImageScalingY)
+		end		
+
+		if love.keyboard.isDown('g') and hot then
+			sendMessage(box.imageId)
 		end
 	
 		cursor_x = cursor_x + gapWidth + imageWidth	
