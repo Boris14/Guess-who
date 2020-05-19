@@ -148,9 +148,11 @@ function drawBoard()
 			rightImageScalingX = imageWidth * 2 / right_image:getWidth()
 			rightImageScalingY = imageHeight * 2 / right_image:getHeight()
 			love.graphics.draw(right_image, currentWidth * 0.7, currentHeight * 0.2, 0, rightImageScalingX, rightImageScalingY)
-			love.graphics.print("Press 'G' to guess", 
+			love.graphics.print(
+				"Press 'G' to guess", 
 				currentWidth * 0.7, 
-				currentHeight * 0.2 + right_image:getHeight() * rightImageScalingY)
+				currentHeight * 0.2 + right_image:getHeight() * rightImageScalingY
+			)
 		end		
 
 		if love.keyboard.isDown('g') and hot then

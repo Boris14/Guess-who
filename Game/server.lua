@@ -37,9 +37,7 @@ function recieveImage()
 					image = love.graphics.newImage( newImageData )					
 					break
 				end
-			elseif event.type == "connect" then
-				--print("Connect:", event.peer)
-			else
+			elseif event.type ~= "connect" then
 				print("Got event", event.type, event.peer)
 				if (event.type == "disconnect") then
 					break

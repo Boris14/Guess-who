@@ -15,24 +15,44 @@ local errorTimer = 1
 local joinTimer = 3
 
 function love.keypressed(k)
-	if not (openFolderMenu or openMenu) and playerJoined and k == 'escape' then
-		server:disconnect()
-		host:flush()
-		love.event.quit()	
-	elseif (k == 'escape') then
-		love.event.quit()
-	elseif k == "backspace" and openCodeInput then
-        local byteoffset = utf8.offset(gameCode, -1)
- 
-        if byteoffset then
-            gameCode = string.sub(gameCode, 1, byteoffset - 1)
-        end
-	elseif k == "return" and openCodeInput then
-		if string.len(gameCode) ~= 4 or tonumber(gameCode) == nil then
-			gameCodeError = true
-		else
-			openCodeInput = false 
-		end   
+	if gameEnd then
+		gameEnd = nil
+		commandValue = nil
+		finished = false
+		openMenu = true
+		buttons = createMenu()
+		hasBoard = false
+		isClient = nil
+		isHost = nil
+		playerJoined = nil
+		joinedGame = false
+		adress = nil
+		guess = nil
+		gotGuess = false
+		directory = nil
+		gameCode = ""
+		Faces = {}
+		myFace = nil
+	else 
+		if not (openFolderMenu or openMenu) and playerJoined and k == 'escape' then
+			server:disconnect()
+			host:flush()
+			love.event.quit()	
+		elseif (k == 'escape') then
+			love.event.quit()
+		elseif k == "backspace" and openCodeInput then
+		    local byteoffset = utf8.offset(gameCode, -1)
+	 
+		    if byteoffset then
+		        gameCode = string.sub(gameCode, 1, byteoffset - 1)
+		    end
+		elseif k == "return" and openCodeInput then
+			if string.len(gameCode) ~= 4 or tonumber(gameCode) == nil then
+				gameCodeError = true
+			else
+				openCodeInput = false 
+			end   
+		end
 	end
 end
 
@@ -193,9 +213,11 @@ function love.draw()
 	if(gameEnd == 1) then
 		love.graphics.clear()	
 		love.graphics.print("You Win!", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
+		love.graphics.print("Press any button to continue...", love.graphics.getWidth() * 0.6, love.graphics.getHeight() * 0.9)
 	elseif(gameEnd == 0) then
 		love.graphics.clear()	
 		love.graphics.print("You Lose!", love.graphics.getWidth()/3, love.graphics.getHeight()/2)
+		love.graphics.print("Press any button to continue...", love.graphics.getWidth() * 0.6, love.graphics.getHeight() * 0.9)
 	end
 end
 
