@@ -5,7 +5,7 @@ require "torch"
 
 function newBox(image)
 	return{
-		image = love.graphics.newImage(image),
+		image = image,
 		up = true,
 		last = false, 
 		now = false
@@ -14,15 +14,6 @@ end
 
 
 success = love.window.setMode(1000, 900)
-
---[[function fileExists(name) 
-	local file = io.open( "Board/ClashRoyale/" .. name, "r" )
-	if file then
-		return true
-	else
-		return false
-	end
-end]]--
 
 function loadImages(directory)
 	local images = {}
@@ -45,21 +36,20 @@ function updateBoard()
 	cursor_x = gapWidth
 end
 
-function loadBoard()
+function loadBoard(faces)
 	boxes = {}
 	font = nil
-	images = {}
-	--font = love.graphics.newFont("/assets/Summit Attack.ttf", 32)
-	images = loadImages("Board/ClashRoyale/")
+	font = love.graphics.newFont("/assets/Summit Attack.ttf", 32)
+	--images = loadImages("Board/ClashRoyale/")
 	avarageWidth = 0
 	avarageHeight = 0
 	for	i = 1, 25 do
-		table.insert(boxes, newBox(images[i]))
+		table.insert(boxes, newBox(faces[i]))
 		avarageWidth = avarageWidth + boxes[i].image:getWidth()
 		avarageHeight = avarageHeight + boxes[i].image:getHeight()
 	end
-	avarageWidth = avarageWidth / table.getn(images)
-	avarageHeight = avarageHeight / table.getn(images)
+	avarageWidth = avarageWidth / table.getn(faces)
+	avarageHeight = avarageHeight / table.getn(faces)
 	avarageArea = avarageWidth * avarageHeight
 	
 	--windowWidth = love.graphics.getWidth()
@@ -115,30 +105,9 @@ function drawBoard()
 		cursor_x = cursor_x + gapWidth + imageWidth	
 	end
 
-	--love.graphics.setFont(font)	
+	love.graphics.setFont(font)	
 	love.graphics.print("You are:", love.graphics.getWidth()*0.7, love.graphics.getHeight() * 0.9)	
 	
 	cursor_y = cursor_y + gapHeight + imageHeight	
 	love.graphics.draw(myImage.image , love.graphics.getWidth()*0.7 + 100, love.graphics.getHeight() * 0.9 - 65, 0, myImageScalingX, myImageScalingY)
 end
-
-function love.load()
-	loadBoard()
-end
-
-
-function love.keypressed(k)
-   if k == 'escape' then
-      love.event.quit()
-   end
-end
-
-function love.update(dt)	
-	updateBoard()
-end
-
-function love.draw()
-	drawBoard()
-		
-end		
-
